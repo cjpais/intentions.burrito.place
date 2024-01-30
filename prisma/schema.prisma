@@ -17,36 +17,50 @@ datasource db {
 model User {
   id         Int          @id @default(autoincrement())
   name       String       @unique
-  intentions Intentions[]
+  url        String?
+  Intentions Intentions[]
   Entries    Entries[]
 }
 
 model Intentions {
-  id      Int              @id @default(autoincrement())
-  text    String
-  title   String?
-  created DateTime         @default(now())
-  ended   DateTime?
-  userId  Int
-  user    User             @relation(fields: [userId], references: [id])
-  entries EntryIntention[]
+  id          Int              @id @default(autoincrement())
+  text        String
+  title       String?
+  created     DateTime         @default(now())
+  ended       DateTime?
+  userId      Int
+  User        User             @relation(fields: [userId], references: [id])
+  Entries     EntryIntention[]
+  Completions Completions[]
 }
 
 model Entries {
-  id         Int              @id @default(autoincrement())
-  hash       String           @unique
-  type       String
-  created    DateTime
-  userId     Int
-  user       User             @relation(fields: [userId], references: [id])
-  intentions EntryIntention[]
+  id          Int              @id @default(autoincrement())
+  hash        String           @unique
+  type        String
+  created     DateTime
+  text        String
+  userId      Int
+  User        User             @relation(fields: [userId], references: [id])
+  Intentions  EntryIntention[]
+  Completions Completions[]
+}
+
+model Completions {
+  id          Int        @id @default(autoincrement())
+  entryId     Int
+  intentionId Int
+  related     Boolean
+  why         String
+  Entry       Entries    @relation(fields: [entryId], references: [id])
+  intention   Intentions @relation(fields: [intentionId], references: [id])
 }
 
 model EntryIntention {
   entryId     Int
   intentionId Int
-  entry       Entries    @relation(fields: [entryId], references: [id])
-  intention   Intentions @relation(fields: [intentionId], references: [id])
+  Entry       Entries    @relation(fields: [entryId], references: [id])
+  Intention   Intentions @relation(fields: [intentionId], references: [id])
 
   @@id([entryId, intentionId])
 }

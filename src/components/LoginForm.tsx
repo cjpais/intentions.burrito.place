@@ -42,11 +42,7 @@ const LoginForm = () => {
           onChange={(e) => setToken(e.target.value)}
         />
       </div>
-      <button
-        className="self-center hover:bg-red-400"
-        onClick={login}
-        disabled={!token}
-      >
+      <button className="self-center" onClick={login} disabled={!token}>
         <img src="/login.svg" className="w-32" />
       </button>
     </div>

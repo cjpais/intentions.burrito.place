@@ -14,6 +14,7 @@ interface LoginState {
   token?: string;
   setToken: (token: string) => void;
   setUser: (user: BurritoUser) => void;
+  logout: () => void;
 }
 
 export const useLoginStore = create<LoginState>()(
@@ -24,6 +25,7 @@ export const useLoginStore = create<LoginState>()(
         token: undefined,
         setToken: (token: string) => set({ token }),
         setUser: (user: BurritoUser) => set({ user }),
+        logout: () => set({ user: undefined, token: undefined }),
       }),
       {
         name: "login-store",

@@ -1,20 +1,11 @@
 import { z } from "zod";
 import { prisma } from "../../../../../prisma/client";
-import fetch from "node-fetch";
+import { fetchAuthPeer } from "@/features/auth";
+import { determinePartOfIntention } from "@/features/entry";
 
 const IntentionRequestSchema = z.object({
   text: z.string(),
   userId: z.number(),
-});
-
-const ValidateAuthResponseSchema = z.object({
-  peer: z
-    .object({
-      name: z.string(),
-      display: z.string(),
-      url: z.string(),
-    })
-    .or(z.undefined()),
 });
 
 export async function POST(request: Request) {
@@ -46,16 +37,7 @@ export async function POST(request: Request) {
   }
 
   // validate the auth matches the user
-  const response = await fetch("https://burrito.place/api/validateAuth", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ token }),
-  })
-    .then((res) => res.json())
-    .then((d) => ValidateAuthResponseSchema.parse(d))
-    .then((d) => d.peer);
+  const response = await fetchAuthPeer({ token });
 
   if (!response || response.name !== user.name) {
     return new Response(null, {
@@ -66,13 +48,34 @@ export async function POST(request: Request) {
   const intention = await prisma.intentions.create({
     data: {
       text,
-      user: {
+      User: {
         connect: {
           id: userId,
         },
       },
     },
   });
+
+  // fetch all existing entries and process them for this intention
+  const allEntries = await prisma.entries.findMany({
+    where: {
+      userId,
+    },
+  });
+
+  // batch process each set of intentions
+  for (const entry of allEntries) {
+    setTimeout(() => {
+      determinePartOfIntention(
+        {
+          id: entry.id,
+          hash: entry.hash,
+          text: entry.text,
+        },
+        intention
+      );
+    }, Math.random() * 10000);
+  }
 
   return new Response(JSON.stringify(intention), {
     status: 200,
