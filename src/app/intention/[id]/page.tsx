@@ -1,5 +1,6 @@
 import React from "react";
 import { prisma } from "../../../../prisma/client";
+import Link from "next/link";
 
 const relatedEntries = async (id: number) => {
   const entries = await prisma.entries.findMany({
@@ -45,9 +46,16 @@ const Page = async ({ params }: { params: { id: string } }) => {
   const entries = await relatedEntries(parseInt(params.id));
   const intention = await getIntention(parseInt(params.id));
 
+  const user = intention?.User.name;
+
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-bold self-center">{intention?.User.name}</h1>
+      <Link
+        className="text-2xl font-bold self-center"
+        href={`/${user}/intentions`}
+      >
+        {user}
+      </Link>
       <h2 className="text-xl font-bold">{intention?.text}</h2>
       <div className="flex flex-col gap-6">
         {entries.map((entry) => (
