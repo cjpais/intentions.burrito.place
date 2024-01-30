@@ -1,7 +1,7 @@
 import { z } from "zod";
 import fetch from "node-fetch";
 
-export const LoginRequestSchema = z.object({
+const LoginRequestSchema = z.object({
   token: z.string(),
 });
 
