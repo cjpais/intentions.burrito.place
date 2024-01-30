@@ -1,5 +1,6 @@
 import { z } from "zod";
 import fetch from "node-fetch";
+import { prisma } from "../../../../prisma/client";
 
 const LoginRequestSchema = z.object({
   token: z.string(),
@@ -32,7 +33,26 @@ export async function POST(request: Request) {
     .then((d) => ValidateAuthResponseSchema.parse(d))
     .then((d) => d.peer);
 
-  return new Response(JSON.stringify({ peer: response }), {
-    status: 200,
+  if (response) {
+    // also store in db
+    const upsertResult = await prisma.user.upsert({
+      where: { name: response.name },
+      update: {
+        name: response.url,
+      },
+      create: {
+        name: response.name,
+      },
+    });
+    return new Response(
+      JSON.stringify({ peer: { ...response, id: upsertResult.id } }),
+      {
+        status: 200,
+      }
+    );
+  }
+
+  return new Response(JSON.stringify({}), {
+    status: 401,
   });
 }

@@ -2,7 +2,7 @@
 
 import { useLoginStore } from "@/features/LoginStore";
 
-const Login = () => {
+const LoginForm = () => {
   const { token, setToken, setUser } = useLoginStore();
 
   const login = () => {
@@ -53,4 +53,4 @@ const Login = () => {
   );
 };
 
-export default Login;
+export default LoginForm;

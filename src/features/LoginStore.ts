@@ -6,6 +6,7 @@ interface BurritoUser {
   name: string;
   display: string;
   url: string;
+  id: number;
 }
 
 interface LoginState {

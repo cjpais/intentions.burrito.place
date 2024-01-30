@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  // Uses connection pooling
+  url       = env("POSTGRES_PRISMA_URL")
+  // Uses direct connection, ⚠️ make sure to keep this to `POSTGRES_URL_NON_POOLING`
+  // or you'll have dangling databases from migrations
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+
+model User {
+  id         Int          @id @default(autoincrement())
+  name       String       @unique
+  intentions Intentions[]
+  Entries    Entries[]
+}
+
+model Intentions {
+  id      Int              @id @default(autoincrement())
+  text    String
+  title   String?
+  created DateTime         @default(now())
+  ended   DateTime?
+  userId  Int
+  user    User             @relation(fields: [userId], references: [id])
+  entries EntryIntention[]
+}
+
+model Entries {
+  id         Int              @id @default(autoincrement())
+  hash       String           @unique
+  type       String
+  created    DateTime
+  userId     Int
+  user       User             @relation(fields: [userId], references: [id])
+  intentions EntryIntention[]
+}
+
+model EntryIntention {
+  entryId     Int
+  intentionId Int
+  entry       Entries    @relation(fields: [entryId], references: [id])
+  intention   Intentions @relation(fields: [intentionId], references: [id])
+
+  @@id([entryId, intentionId])
+}
