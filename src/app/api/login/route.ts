@@ -38,7 +38,8 @@ export async function POST(request: Request) {
     const upsertResult = await prisma.user.upsert({
       where: { name: response.name },
       update: {
-        name: response.url,
+        name: response.name,
+        // url: response.url,
       },
       create: {
         name: response.name,
