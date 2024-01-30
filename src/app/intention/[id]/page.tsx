@@ -28,25 +28,42 @@ const relatedEntries = async (id: number) => {
   return entries;
 };
 
+const getIntention = async (id: number) => {
+  const intention = await prisma.intentions.findUnique({
+    where: {
+      id,
+    },
+    include: {
+      User: true,
+    },
+  });
+
+  return intention;
+};
+
 const Page = async ({ params }: { params: { id: string } }) => {
   const entries = await relatedEntries(parseInt(params.id));
+  const intention = await getIntention(parseInt(params.id));
 
   return (
-    <div className="flex flex-col gap-2">
-      <h1 className="text-2xl font-bold"></h1>
-      {entries.map((entry) => (
-        <div key={entry.id}>
-          <h3>{entry.hash}</h3>
-          <p>{entry.text}</p>
-          <div>
-            {entry.Completions.map((completion) => (
-              <div key={completion.id}>
-                <p>{completion.why}</p>
-              </div>
-            ))}
+    <div className="flex flex-col gap-4">
+      <h1 className="text-2xl font-bold self-center">{intention?.User.name}</h1>
+      <h2 className="text-xl font-bold">{intention?.text}</h2>
+      <div className="flex flex-col gap-6">
+        {entries.map((entry) => (
+          <div key={entry.id}>
+            {/* <h3>{entry.hash}</h3> */}
+            <p>{entry.text}</p>
+            <div>
+              {entry.Completions.map((completion) => (
+                <div key={completion.id} className="text-xs italic">
+                  <p>why llm thinks this fits: {completion.why}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 };
