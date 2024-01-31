@@ -32,7 +32,7 @@ const fetchAndProcessAllExistingEntries = async (
     },
     body: JSON.stringify({
       query:
-        "Get me all of the entries, with their hash, created date, type, description, and summary",
+        "Get me all of the entries, with their hash, created date, type, description, summary, and title",
     }),
   })
     .then((res) => res.json())
@@ -65,7 +65,7 @@ const fetchAndProcessAllExistingEntries = async (
           },
           intention
         );
-      }, Math.random() * 100000);
+      }, Math.random() * 50000);
     });
   }
 };
